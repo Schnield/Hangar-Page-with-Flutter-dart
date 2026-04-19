@@ -1,112 +1,97 @@
 import 'package:flutter/material.dart';
 import '../models/aircraft.dart';
 import '../widgets/aircraft_card.dart';
+import '../widgets/custom_text_field.dart'; // Baru
 import 'detail_page.dart';
 
-// halaman home page untuk menampilkan daftar pesawat dengan fitur pencarian sederhana
-
-// HangarPage adalah halaman utama yang menampilkan daftar pesawat yang tersedia di hangar, 
-// lengkap dengan fitur pencarian untuk memudahkan pengguna menemukan pesawat yang diinginkan. 
-// Setiap pesawat ditampilkan dalam bentuk kartu yang interaktif, 
-// dan pengguna dapat mengetuk kartu untuk melihat detail lebih lanjut 
-// tentang pesawat tersebut di halaman DetailPage.
 class HangarPage extends StatefulWidget {
   const HangarPage({super.key});
 
   @override
-  // Membuat state untuk HangarPage agar dapat mengelola perubahan data saat pencarian
   State<HangarPage> createState() => _HangarPageState(); 
 }
 
-// State untuk HangarPage yang mengelola logika pencarian dan daftar pesawat yang ditampilkan
 class _HangarPageState extends State<HangarPage> {
-  // Controller untuk menangani input di kolom pencarian
-  final TextEditingController _searchController = TextEditingController();
-  
-  // List hasil filter yang akan ditampilkan di layar
   List<Aircraft> _filteredAircraft = [];
+  bool _isLoading = false; // State baru untuk loading skeleton
 
   @override
-  void initState() {    // Inisialisasi awal: tampilkan semua pesawat
-    super.initState();  // Memanggil initState untuk melakukan setup awal sebelum widget ditampilkan
-    // Inisialisasi awal: tampilkan semua pesawat
+  void initState() {    
+    super.initState();  
     _filteredAircraft = aircraftList;
   }
 
-  // Fungsi pencarian (Basic State Management)
-  void _runFilter(String enteredKeyword) {  // Fungsi untuk memfilter daftar pesawat berdasarkan input pencarian
-    List<Aircraft> results = [];            // List sementara untuk menyimpan hasil filter
-    if (enteredKeyword.isEmpty) {           // Jika kolom pencarian kosong, tampilkan semua pesawat
-      results = aircraftList;               // Menampilkan semua pesawat jika tidak ada kata kunci yang dimasukkan
-    } else {
-      results = aircraftList
-          .where((aircraft) =>
-              // Filter berdasarkan nama pesawat, case-insensitive
-              aircraft.name.toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList(); // Konversi hasil filter menjadi list
-    }
+  // fungsi untuk memfilter daftar pesawat berdasarkan keyword yang dimasukkan di kolom pencarian
+  void _runFilter(String enteredKeyword) {
+    // setState(() {
+    //   _isLoading = true; // Aktifkan loading saat mulai mencari
+    // });
 
-    // Memberitahu Flutter untuk menggambar ulang UI dengan data baru
-    setState(() {
-      _filteredAircraft = results; // Update daftar pesawat yang ditampilkan sesuai hasil filter
-    });
+    // Simulasi delay jaringan/proses selama 800ms
+    // Future.delayed(const Duration(milliseconds: 800), () {
+    //   List<Aircraft> results = [];
+    //   if (enteredKeyword.isEmpty) {
+    //     results = aircraftList;
+    //   } else {
+    //     results = aircraftList
+    //         .where((aircraft) =>
+    //             aircraft.name.toLowerCase().contains(enteredKeyword.toLowerCase()))
+    //         .toList();
+    //   }
+
+      // Contoh hasil filter (untuk testing, bisa dihapus saat implementasi sebenarnya)
+      List<Aircraft> results = [];
+
+      if (enteredKeyword.isEmpty) {
+        results = aircraftList;
+      } else {
+        results = aircraftList
+            .where((aircraft) =>
+                aircraft.name.toLowerCase().contains(enteredKeyword.toLowerCase()))
+            .toList();
+      }
+
+      setState(() {
+        _filteredAircraft = results;
+        _isLoading = false; // Matikan loading setelah selesai
+      });
+    // }); // un-comment saat ingin menggunakan simulasi delay untuk melihat efek loading skeleton
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HANGAR INFORMATION', 
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        title: const Text('Hangar Inventory'),
         centerTitle: true,
-        elevation: 0,       // Menghilangkan shadow pada AppBar untuk tampilan yang lebih bersih
-        backgroundColor: Colors.white,
       ),
-      body: Column(   // Menggunakan Column untuk menempatkan widget pencarian di atas dan daftar pesawat di bawah
+      body: Column(
         children: [
-          // 1. Search Section (Hanya penelusuran biasa)
+          // SEBELUMNYA: Padding berisi TextField panjang
+          // SESUDAHNYA: Memanggil Reusable Widget CustomTextField
           Padding(
-            padding: const EdgeInsets.all(16.0),  
-            // Memberikan padding di sekitar kolom pencarian agar tidak menempel ke tepi layar
-            
-            child: TextField(
-              controller: _searchController, // Menghubungkan TextField dengan controller untuk mengelola input pengguna
-              onChanged: (value) => _runFilter(value),  
-              // Memanggil fungsi filter setiap kali teks berubah untuk memperbarui daftar pesawat yang ditampilkan
-              
-              // Dekorasi untuk kolom pencarian dengan label, ikon, dan border yang melengkung
-              decoration: InputDecoration( 
-                labelText: 'Search Aircraft...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
+            padding: const EdgeInsets.all(16.0),
+            child: CustomTextField(
+              label: 'Search Aircraft...',
+              prefixIcon: Icons.search,
+              onTyping: () => setState(() => _isLoading = true), // Tampilkan loading saat mengetik
+              onChanged: (value) => _runFilter(value),
             ),
           ),
-
-          // 2. List Section
+          
           Expanded(
-            child: _filteredAircraft.isNotEmpty // Mengecek apakah ada hasil filter yang ditemukan
-                ? ListView.builder( 
-                  // Menggunakan ListView.builder untuk membuat daftar yang dapat digulir 
-                  // dengan jumlah item yang tidak terbatas
-
-                    // Menampilkan daftar pesawat yang sudah difilter
+            child: _isLoading 
+              ? ListView.builder( // Menampilkan 5 skeleton saat loading
+                  itemCount: 5,
+                  itemBuilder: (context, index) => const AircraftCard(isLoading: true),
+                )
+              : _filteredAircraft.isNotEmpty
+                ? ListView.builder(
                     itemCount: _filteredAircraft.length,
-
-                    // Setiap item di list akan menjadi kartu pesawat yang bisa diklik
                     itemBuilder: (context, index) {
-
-                      // Ketika kartu pesawat diklik, navigasi ke halaman detail dengan data pesawat yang dipilih
                       return AircraftCard(
-
-                        // Mengirim data pesawat yang sudah difilter ke widget AircraftCard
                         aircraft: _filteredAircraft[index],
                         onTap: () {
-                          // Navigator untuk berpindah ke halaman detail
                           Navigator.push(
                             context,
                             MaterialPageRoute(

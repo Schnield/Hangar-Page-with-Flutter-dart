@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import '../models/aircraft.dart';
-
-// Halaman Detail untuk menampilkan informasi lengkap 
-// tentang pesawat yang dipilih dari HangarPage
+import '../widgets/custom_button.dart'; // Baru
 
 class DetailPage extends StatelessWidget {
   final Aircraft aircraft;
 
-  const DetailPage({super.key, required this.aircraft}); // Menerima objek Aircraft yang dipilih dari halaman sebelumnya
+  const DetailPage({super.key, required this.aircraft});
 
   @override
   Widget build(BuildContext context) {
-    // 1. Widget Title Section (Nama, Asal, dan Rating)
+    // titleSection menampilkan nama dan asal pesawat dengan styling yang sesuai desain
     Widget titleSection = Container(
       padding: const EdgeInsets.all(32),
       child: Row(
@@ -48,20 +46,30 @@ class DetailPage extends StatelessWidget {
         ],
       ),
     );
-
-    // 2. Widget Button Section (Call, Route, Share)
-    Color color = Theme.of(context).primaryColor;
-
+    
+    // buttonSection menggunakan CustomButton yang lebih clean
     Widget buttonSection = Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildButtonColumn(color, Icons.call, 'CALL'),
-        _buildButtonColumn(color, Icons.near_me, 'ROUTE'),
-        _buildButtonColumn(color, Icons.share, 'SHARE'),
+        CustomButton(
+          icon: Icons.call,
+          label: 'CALL',
+          onTap: () {},
+        ),
+        CustomButton(
+          icon: Icons.near_me,
+          label: 'ROUTE',
+          onTap: () {},
+        ),
+        CustomButton(
+          icon: Icons.share,
+          label: 'SHARE',
+          onTap: () {},
+        ),
       ],
     );
 
-    // 3. Widget Text Section (Deskripsi Lengkap)
+    // textSection menampilkan deskripsi lengkap pesawat dengan padding dan styling yang nyaman dibaca
     Widget textSection = Padding(
       padding: const EdgeInsets.all(32),
       child: Text(
@@ -71,55 +79,21 @@ class DetailPage extends StatelessWidget {
       ),
     );
 
+    // Scaffold utama yang menyusun semua section di atas dalam ListView agar bisa di-scroll
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detail Information'),
-      ),
+      appBar: AppBar(title: Text(aircraft.name)),
       body: ListView(
         children: [
-          // Header Image menggunakan data dari model widgets aircraft_card.dart
-          // Gunakan AspectRatio agar tinggi mengikuti lebar secara proporsional
           AspectRatio(
-            aspectRatio: 16 / 9, // Rasio layar lebar standar
-            child: Image.asset(
-              aircraft.imagePath,
-              // BoxFit.cover menjaga gambar tidak gepeng, tapi akan memotong sedikit pinggirnya
-              // Jika ingin melihat seluruh badan pesawat tanpa terpotong sama sekali, gunakan BoxFit.contain
-              fit: BoxFit.cover, 
-              // Alignment.center memastikan fokus kamera ada di tengah gambar
-              alignment: Alignment.center,
-            ),
+            aspectRatio: 16 / 9,
+            child: Image.asset(aircraft.imagePath, fit: BoxFit.cover),
           ),
+          // Memanggil section yang sudah didefinisikan
           titleSection,
           buttonSection,
           textSection,
         ],
       ),
-    );
-  }
-
-  // Helper Method untuk membuat kolom tombol agar kode tetap clean
-  Column _buildButtonColumn(Color color, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,   
-      // Menggunakan MainAxisSize.min agar kolom hanya sebesar isinya, tidak memakan ruang vertikal lebih
-
-      mainAxisAlignment: MainAxisAlignment.center, // Mengatur ikon dan teks agar berada di tengah kolom
-      // Membuat ikon dan teks dengan warna yang sama untuk konsistensi desain
-      children: [
-        Icon(icon, color: Colors.indigo),
-        Container(
-          margin: const EdgeInsets.only(top: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: Colors.indigo,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
