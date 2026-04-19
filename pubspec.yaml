@@ -1,0 +1,41 @@
+name: mini_task
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/su35black.jpg
+    - assets/images/mig-15-bis.jpg
+    - assets/images/j-10b.jpg
+    - assets/images/mirage2k5.png
+    - assets/images/dassault_rafale.webp
+    - assets/images/eurofighter-typhoon-1.webp
+    - assets/images/f-15-eagle.webp
+    - assets/images/f18c-hornet.jpg
+    - assets/images/f16c-viper.jpg
+    - assets/images/mig35-fulcrum-f.jpg
+    - assets/images/f-86_sabre.jpg
+    - assets/images/mig-31bm.jpg
+    - assets/images/jas_39_gripen.jpg
+
+  fonts:
+    - family: RobotoCondensed
+      fonts:
+        - asset: assets/fonts/RobotoCondensed-Regular.ttf
+        - asset: assets/fonts/RobotoCondensed-Bold.ttf
+          weight: 700
